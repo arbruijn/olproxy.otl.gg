@@ -39,7 +39,7 @@ class WebSocketClient {
         this.url = url;
         this.instance = new WebSocket(this.url);
 
-        this.instance.onpen = () => {
+        this.instance.onopen = () => {
             wsc.onopen();
         };
 

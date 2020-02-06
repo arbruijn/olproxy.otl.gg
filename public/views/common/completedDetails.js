@@ -38,7 +38,7 @@ class CompletedDetailsView {
             <div class="table">
                 <div class="server">${addLink ? /* html */`
                     <a href="/archive/${id}">
-                        ` : ""}${CompletedDetailsView.Common.htmlEncode((game.server && game.server.name ? game.server.name : game.ip) || "Unknown")}${addLink ? /* html */`
+                        ` : ""}${CompletedDetailsView.Common.htmlEncode(game.server && game.server.name || game.server && game.server.ip || game.ip || "Unknown")}${addLink ? /* html */`
                     </a>
                 ` : ""}</div>
                 <div class="scores">
@@ -49,7 +49,7 @@ class CompletedDetailsView {
                         Completed <time class="timeago" datetime="${new Date(game.end).toISOString()}">${new Date(game.end)}</time>
                     </div>
                     ${game.settings ? /* html */`
-                        <div class="map">${game.settings.matchMode}${game.settings.level && ` - ${CompletedDetailsView.Common.htmlEncode(game.settings.level)}` || ""}</div>
+                        <div class="map">${CompletedDetailsView.Common.htmlEncode(game.settings.matchMode)}${game.settings.level && ` - ${CompletedDetailsView.Common.htmlEncode(game.settings.level)}` || ""}</div>
                     ` : ""}
                     ${game.settings && game.settings.condition ? /* html */`
                         <div class="condition">${game.settings.condition}</div>

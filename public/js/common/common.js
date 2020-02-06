@@ -1,3 +1,5 @@
+/* globals timeago */
+
 //   ###
 //  #   #
 //  #       ###   ## #   ## #    ###   # ##
@@ -115,6 +117,10 @@ class Common {
      * @returns {string} The encoded string.
      */
     static htmlEncode(str) {
+        if (!str) {
+            return "";
+        }
+
         return str.replace(/[\u0080-\uFFFF<>&]/gim, (i) => "&#" + i.charCodeAt(0) + ";");
     }
 
@@ -148,6 +154,25 @@ class Common {
                 el.innerHTML = template(data);
             }
         });
+    }
+
+    // ##                   #  ###    #                 ##
+    //  #                   #   #                      #  #
+    //  #     ##    ###   ###   #    ##    # #    ##   #  #   ###   ##
+    //  #    #  #  #  #  #  #   #     #    ####  # ##  ####  #  #  #  #
+    //  #    #  #  # ##  #  #   #     #    #  #  ##    #  #   ##   #  #
+    // ###    ##    # #   ###   #    ###   #  #   ##   #  #  #      ##
+    //                                                        ###
+    /**
+     * Loads the timeago elements on the page.
+     * @returns {void}
+     */
+    static loadTimeAgo() {
+        const els = document.querySelectorAll(".timeago");
+
+        if (els.length > 0) {
+            timeago.render(els);
+        }
     }
 
     //              #       #          #

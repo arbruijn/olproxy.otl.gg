@@ -104,3 +104,11 @@ pre {
     display: inline;
     font-family: "Courier New", Courier, monospace;
 }
+
+button {
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    width: 19px;
+}

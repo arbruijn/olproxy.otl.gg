@@ -111,6 +111,13 @@ class Stats {
             game.teamScore = {"BLUE": 0, "ORANGE": 0};
         }
 
+        if (event === "Return" && !scorer) {
+            game.flagStats.push(data);
+            data.description = `The ${scorerTeam} flag has been automatically returned.`;
+            game.events.push(data);
+            return;
+        }
+
         const scorerPlayer = game.getPlayer(scorer);
 
         scorerPlayer.team = scorerTeam;
@@ -188,7 +195,7 @@ class Stats {
     /**
      * Processes the end game stat.
      * @param {string} ip The IP address of the server to update.
-     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[], flagStats: object[], teamScore: object, players: object[]}} data The end game data.
+     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[], flagStats: object[], teamScore: object, players: object[], id: number?}} data The end game data.
      * @returns {Promise} A promise that resolves when the stat has been processed.
      */
     static async endGame(ip, data) {
@@ -197,10 +204,10 @@ class Stats {
 
         game.start = start;
         game.end = end;
-        game.damage = damage;
-        game.kills = kills;
-        game.goals = goals;
-        game.flagStats = flagStats;
+        game.damage = damage || [];
+        game.kills = kills || [];
+        game.goals = goals || [];
+        game.flagStats = flagStats || [];
 
         game.damage.forEach((stat) => {
             stat.weapon = Weapon.weaponNames[Weapon.weapons.indexOf(stat.weapon)];
@@ -265,13 +272,16 @@ class Stats {
 
                 break;
             case "CTF":
-                game.flagStats = game.flagStats || [];
                 game.teamScore = {
                     "BLUE": game.flagStats.filter((f) => f.scorerTeam === "BLUE" && f.event === "Capture").length,
                     "ORANGE": game.flagStats.filter((f) => f.scorerTeam === "ORANGE" && f.event === "Capture").length
                 };
 
                 game.flagStats.forEach((flag) => {
+                    if (!flag.scorer) {
+                        return;
+                    }
+
                     const scorerPlayer = game.getPlayer(flag.scorer, flag.scorerTeam);
 
                     switch (flag.event) {
@@ -300,6 +310,22 @@ class Stats {
             data.id = await Db.add(ip, game);
         }
 
+        game.remove();
+    }
+
+    //              #     #     ##
+    //                    #    #  #
+    //  ##   #  #  ##    ###   #      ###  # #    ##
+    // # ##   ##    #     #    # ##  #  #  ####  # ##
+    // ##     ##    #     #    #  #  # ##  #  #  ##
+    //  ##   #  #  ###     ##   ###   # #  #  #   ##
+    /**
+     * Removes a game.
+     * @param {string} ip The IP address of the game to remove.
+     * @returns {Promise} A promise that resolves when the game has been removed.
+     */
+    static async exitGame(ip) {
+        const game = await Game.getGame(ip);
         game.remove();
     }
 
@@ -436,11 +462,6 @@ class Stats {
         game.events.push(data);
     }
 
-    static async exitGame(ip, data) {
-        const game = await Game.getGame(ip);
-        game.remove();
-    }
-
     //                                              ##    #           #
     //                                             #  #   #           #
     // ###   ###    ##    ##    ##    ###    ###    #    ###    ###  ###
@@ -456,8 +477,9 @@ class Stats {
      */
     static async processStat(ip, data) {
         if (!Game.getByIp(ip) && data.type !== "StartGame" && data.type !== "LobbyStatus") {
-            if (data.type === "LobbyExit" || data.type === "Disconnect")
+            if (data.type === "LobbyExit" || data.type === "Disconnect") {
                 return;
+            }
 
             await Stats.startGame(ip, {matchMode: "ANARCHY"});
 
@@ -496,7 +518,7 @@ class Stats {
                     await Stats.endGame(ip, data);
                     break;
                 case "LobbyExit":
-                    await Stats.exitGame(ip, data);
+                    await Stats.exitGame(ip);
                     break;
             }
 
@@ -524,7 +546,7 @@ class Stats {
         }
 
         game.settings = data;
-        game.inLobby = data.type == 'LobbyStatus';
+        game.inLobby = data.type === "LobbyStatus";
 
         game.players = data.players && data.players.map((player) => new Player({
             name: player,

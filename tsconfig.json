@@ -11,6 +11,10 @@
         "target": "es2017"
     },
     "exclude": [
-        "public/**/*"
+        "public/js/**/*"
+    ],
+    "include": [
+        "**/*.d.ts",
+        "**/*.js"
     ]
 }

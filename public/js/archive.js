@@ -1,4 +1,4 @@
-/* global timeago */
+/* global Common */
 
 //    #                  #        #                    ###
 //   # #                 #                               #
@@ -22,7 +22,7 @@ class ArchiveJs {
      * @returns {void}
      */
     static DOMContentLoaded() {
-        timeago().render(document.querySelectorAll(".timeago"));
+        Common.loadTimeAgo();
 
         document.querySelectorAll("a.weapon").forEach((a) => a.addEventListener("click", (ev) => {
             document.getElementById("weapon").innerText = a.title;

@@ -25,7 +25,7 @@ class ServerView {
     static get(server, old) {
         return /* html */`
             <div ${old ? "class=\"old\"" : ""}>${ServerView.Common.htmlEncode(server.name)}</div>
-            <div ${old ? "class=\"old\"" : ""}>${server.ip}</div>
+            <div ${old ? "class=\"old\"" : ""}>${ServerView.Common.htmlEncode(server.ip)}</div>
             <div ${old ? "class=\"old\"" : ""}><time class="timeago" datetime="${new Date(server.lastSeen).toISOString()}">${new Date(server.lastSeen)}</time></div>
             <div ${old ? "class=\"old\"" : ""}>${ServerView.Common.htmlEncode(server.notes)}</div>
         `;

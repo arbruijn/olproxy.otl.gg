@@ -1,4 +1,4 @@
-/* global EventsView, PlayersView, ScoreView, timeago, WebSocketClient */
+/* global Common, EventsView, PlayersView, ScoreView, WebSocketClient */
 
 //   ###                          ###
 //  #   #                           #
@@ -22,7 +22,7 @@ class GameJs {
      * @returns {void}
      */
     static DOMContentLoaded() {
-        timeago().render(document.querySelectorAll(".timeago"));
+        Common.loadTimeAgo();
 
         GameJs.ws = new WebSocketClient();
         GameJs.ws.onmessage = GameJs.onmessage;
@@ -167,6 +167,12 @@ class GameJs {
             document.querySelector(".map").innerText = GameJs.game.settings.matchMode;
         }
 
+        if (event === "Return" && !scorer) {
+            GameJs.game.flagStats.push(data);
+            GameJs.game.events.push(data);
+            return;
+        }
+
         GameJs.game.events.push(data);
         GameJs.game.flagStats.push(data);
 
@@ -222,7 +228,7 @@ class GameJs {
     //  ##   #  #   ###   ###   # #  #  #   ##
     /**
      * Processes the end game stat.
-     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[]}} data The end game data.
+     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[], flagStats: object[], players: object[], teamScore: object}} data The end game data.
      * @returns {void}
      */
     static endGame(data) {
@@ -230,12 +236,12 @@ class GameJs {
 
         GameJs.game.start = new Date(start);
         GameJs.game.end = new Date(end);
-        GameJs.game.damage = damage;
-        GameJs.game.kills = kills;
-        GameJs.game.goals = goals;
-        GameJs.game.flagStats = flagStats;
-        GameJs.game.players = players;
-        GameJs.game.teamScore = teamScore;
+        GameJs.game.damage = damage || [];
+        GameJs.game.kills = kills || [];
+        GameJs.game.goals = goals || [];
+        GameJs.game.flagStats = flagStats || [];
+        GameJs.game.players = players || [];
+        GameJs.game.teamScore = teamScore || {};
 
         GameJs.ws.instance.close();
 
@@ -244,7 +250,7 @@ class GameJs {
             Completed <time class="timeago" datetime="${new Date(GameJs.game.end).toISOString()}">${new Date(GameJs.game.end)}</time>
         `;
 
-        timeago().render(document.querySelectorAll(".timeago"));
+        Common.loadTimeAgo();
     }
 
     //                   ##

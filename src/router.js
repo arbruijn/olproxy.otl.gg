@@ -75,7 +75,9 @@ class Router {
             } else {
                 const classInfo = require(filename);
                 classes[filename] = classInfo.route;
-                if (!classInfo.route.includes) {
+                if (classInfo.route.webSocket) {
+                    classes[filename].events = Object.getOwnPropertyNames(classInfo).filter((p) => typeof classInfo[p] === "function");
+                } else if (!classInfo.route.include) {
                     classes[filename].methods = Object.getOwnPropertyNames(classInfo).filter((p) => typeof classInfo[p] === "function");
                 }
                 classes[filename].file = filename;
@@ -101,7 +103,24 @@ class Router {
         const router = express.Router(),
             filenames = Object.keys(classes),
             includes = filenames.filter((c) => classes[c].include),
-            pages = filenames.filter((c) => !classes[c].include && classes[c].path && classes[c].methods && classes[c].methods.length > 0);
+            webSockets = filenames.filter((c) => classes[c].webSocket),
+            pages = filenames.filter((c) => !classes[c].include && !classes[c].webSocket && classes[c].path && classes[c].methods && classes[c].methods.length > 0);
+
+        webSockets.forEach((filename) => {
+            const classInfo = classes[filename];
+
+            router.ws(classInfo.path, (ws, req) => {
+                ws.url = req.url.replace("/.websocket", "").replace(".websocket", "") || "/";
+
+                classInfo.events.forEach((event) => {
+                    ws.on(event, (...args) => {
+                        classInfo.class[event](ws, ...args);
+                    });
+                });
+
+                ws.emit("init");
+            });
+        });
 
         pages.forEach((filename) => {
             const classInfo = classes[filename];

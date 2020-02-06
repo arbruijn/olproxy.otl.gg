@@ -60,23 +60,32 @@ class Home {
 
         res.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
 
-        res.status(200).send(Common.page(/* html */`
-            <link rel="stylesheet" href="/css/home.css" />
-            <script src="/js/common/timeago.min.js"></script>
-            <script src="/views/common/score.js"></script>
-            <script src="/views/common/details.js"></script>
-            <script src="/views/home/games.js"></script>
-            <script src="/views/common/completedDetails.js"></script>
-            <script src="/views/home/completedGames.js"></script>
-            <script src="/views/home/server.js"></script>
-            <script src="/views/home/servers.js"></script>
-            <script src="/js/common/websocketclient.js"></script>
-            <script src="/js/common/countdown.js"></script>
-            <script src="/js/common/elapsed.js"></script>
-            <script src="/js/common/player.js"></script>
-            <script src="/js/common/game.js"></script>
-            <script src="/js/home.js"></script>
-        `, HomeView.get(completed, games, servers), req));
+        res.status(200).send(Common.page(
+            "",
+            {
+                js: [
+                    "/js/common/timeago.min.js",
+                    "/js/common/clipboard.min.js",
+                    "/js/common/clipboard.js",
+                    "/views/common/score.js",
+                    "/views/common/details.js",
+                    "/views/home/games.js",
+                    "/views/common/completedDetails.js",
+                    "/views/home/completedGames.js",
+                    "/views/home/server.js",
+                    "/views/home/servers.js",
+                    "/js/common/websocketclient.js",
+                    "/js/common/countdown.js",
+                    "/js/common/elapsed.js",
+                    "/js/common/player.js",
+                    "/js/common/game.js",
+                    "/js/home.js"
+                ],
+                css: ["/css/home.css"]
+            },
+            HomeView.get(completed, games, servers),
+            req
+        ));
     }
 }
 

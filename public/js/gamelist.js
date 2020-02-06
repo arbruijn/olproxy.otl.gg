@@ -1,3 +1,5 @@
+/* global Common, GamesView */
+
 //   ###                        #        #            #
 //  #   #                       #                     #
 //  #       ###   ## #    ###   #       ##     ###   ####
@@ -22,6 +24,24 @@ class GameList {
     static DOMContentLoaded() {
         document.getElementById("prev").addEventListener("click", GameList.prev);
         document.getElementById("next").addEventListener("click", GameList.next);
+        GameList.parseTime();
+    }
+
+    //                                ###    #
+    //                                 #
+    // ###    ###  ###    ###    ##    #    ##    # #    ##
+    // #  #  #  #  #  #  ##     # ##   #     #    ####  # ##
+    // #  #  # ##  #       ##   ##     #     #    #  #  ##
+    // ###    # #  #     ###     ##    #    ###   #  #   ##
+    // #
+    /**
+     * Parses time elements to display the local time.
+     * @returns {void}
+     */
+    static parseTime() {
+        for (const time of document.getElementsByClassName("local")) {
+            time.innerText = Common.formatDate(new Date(time.dateTime));
+        }
     }
 
     //               #
@@ -45,6 +65,7 @@ class GameList {
         if (lastId === GameList.minId) {
             document.getElementById("next").classList.add("hidden");
         }
+        GameList.parseTime();
     }
 
     // ###   ###    ##   # #
@@ -63,7 +84,7 @@ class GameList {
         ev.preventDefault();
         ev.stopPropagation();
         return false;
-}
+    }
 
     //                    #
     //                    #

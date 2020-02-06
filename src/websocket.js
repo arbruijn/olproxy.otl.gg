@@ -1,17 +1,13 @@
 /**
- * @typedef {import("express").Express} Express
+ * @typedef {import("ws")} WebSocket
  */
 
-const http = require("http"),
-    Ws = require("ws"),
-    Wss = Ws.Server,
-
-    gameMatch = /\/game\/(?<ip>.*)/;
+const gameMatch = /\/game\/(?<ip>.*)/;
 
 /**
- * @type {Ws.Server}
+ * @type {WebSocket[]}
  */
-let wss;
+const clients = [];
 
 //  #   #         #                           #              #
 //  #   #         #                           #              #
@@ -38,7 +34,11 @@ class Websocket {
     static broadcast(message) {
         const str = JSON.stringify(message);
 
-        wss.clients.forEach((client) => {
+        clients.forEach((client) => {
+            if (client.readyState !== 1) {
+                return;
+            }
+
             if (client.url === "/") {
                 client.send(str);
             } else if (gameMatch.test(client.url)) {
@@ -51,26 +51,36 @@ class Websocket {
         });
     }
 
-    //         #                 #
-    //         #                 #
-    //  ###   ###    ###  ###   ###
-    // ##      #    #  #  #  #   #
-    //   ##    #    # ##  #      #
-    // ###      ##   # #  #       ##
+    //                    #            #
+    //                                 #
+    // ###    ##    ###  ##     ###   ###    ##   ###
+    // #  #  # ##  #  #   #    ##      #    # ##  #  #
+    // #     ##     ##    #      ##    #    ##    #
+    // #      ##   #     ###   ###      ##   ##   #
+    //              ###
     /**
-     * Starts up the web server and websockets.
-     * @returns {http.Server} The server.
+     * Registers a websocket for broadcasting.
+     * @param {WebSocket} ws The websocket to broadcast to.
+     * @returns {void}
      */
-    static start() {
-        const server = http.createServer();
+    static register(ws) {
+        clients.push(ws);
+    }
 
-        wss = new Wss({server});
-
-        wss.on("connection", (socket, request) => {
-            socket.url = request.url;
-        });
-
-        return server;
+    //                                #            #
+    //                                             #
+    // #  #  ###   ###    ##    ###  ##     ###   ###    ##   ###
+    // #  #  #  #  #  #  # ##  #  #   #    ##      #    # ##  #  #
+    // #  #  #  #  #     ##     ##    #      ##    #    ##    #
+    //  ###  #  #  #      ##   #     ###   ###      ##   ##   #
+    //                          ###
+    /**
+     * Unregisters a websocket from broadcasting.
+     * @param {WebSocket} ws The websocket to stop broadcasting to.
+     * @returns {void}
+     */
+    static unregister(ws) {
+        clients.splice(clients.indexOf(ws), 1);
     }
 }
 

@@ -82,29 +82,29 @@ class Completed {
             if (game.events) {
                 game.events.sort((a, b) => a.time - b.time);
             }
-        }
 
-        const damage = [];
+            const damage = [];
 
-        game.damage.forEach((dmg) => {
-            const stat = damage.find((d) => d.attacker === dmg.attacker && d.defender === dmg.defender && d.weapon === dmg.weapon);
+            game.damage.forEach((dmg) => {
+                const stat = damage.find((d) => d.attacker === dmg.attacker && d.defender === dmg.defender && d.weapon === dmg.weapon);
 
-            if (stat) {
-                stat.damage += dmg.damage;
-            } else {
-                damage.push({
-                    attacker: dmg.attacker,
-                    defender: dmg.defender,
-                    weapon: dmg.weapon,
-                    damage: dmg.damage
-                });
+                if (stat) {
+                    stat.damage += dmg.damage;
+                } else {
+                    damage.push({
+                        attacker: dmg.attacker,
+                        defender: dmg.defender,
+                        weapon: dmg.weapon,
+                        damage: dmg.damage
+                    });
+                }
+            });
+
+            game.damage = damage;
+
+            if (!includeServer) {
+                delete game.server;
             }
-        });
-
-        game.damage = damage;
-
-        if (!includeServer) {
-            delete game.server;
         }
 
         return game;

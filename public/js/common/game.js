@@ -2,7 +2,7 @@
 
 /**
  * @typedef {import("./player")} Player
- * @typedef {{ip: string, settings?: object, server?: string, start?: Date, end?: Date, players: Player[], kills: object[], goals: object[], events: object[], damage?: object[], teamScore: Object<string, number>}} GameData
+ * @typedef {{ip: string, settings?: object, server?: string, start?: Date, end?: Date, players?: Player[], kills?: object[], goals?: object[], events?: object[], damage?: object[], teamScore?: Object<string, number>}} GameData
  */
 
 //   ###
@@ -32,13 +32,13 @@ class Game {
         this.server = data.server;
         this.start = data.start;
         this.end = data.end;
-        this.players = data.players;
-        this.kills = data.kills;
-        this.goals = data.goals;
-        this.flagStats = data.flagStats;
-        this.events = data.events;
-        this.damage = data.damage;
-        this.teamScore = data.teamScore;
+        this.players = data.players || [];
+        this.kills = data.kills || [];
+        this.goals = data.goals || [];
+        this.flagStats = data.flagStats || [];
+        this.events = data.events || [];
+        this.damage = data.damage || [];
+        this.teamScore = data.teamScore || {};
         this.countdown = data.countdown;
     }
 
@@ -57,15 +57,7 @@ class Game {
     static getGame(ip) {
         let game = Game.games.find((g) => g.ip === ip);
         if (!game) {
-            Game.games.push(game = new Game({
-                ip,
-                players: [],
-                kills: [],
-                goals: [],
-                flagStats: [],
-                events: [],
-                teamScore: {}
-            }));
+            Game.games.push(game = new Game({ip}));
         }
 
         return game;

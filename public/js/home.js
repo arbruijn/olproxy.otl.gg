@@ -1,4 +1,4 @@
-/* global Common, CompletedDetailsView, Countdown, DetailsView, Elapsed, Game, Player, ScoreView, ServersView, timeago, WebSocketClient */
+/* global Common, CompletedDetailsView, Countdown, DetailsView, Elapsed, Game, Player, ScoreView, ServersView, WebSocketClient */
 
 //  #   #
 //  #   #
@@ -22,7 +22,7 @@ class Home {
      * @returns {void}
      */
     static DOMContentLoaded() {
-        timeago().render(document.querySelectorAll(".timeago"));
+        Common.loadTimeAgo();
 
         Home.ws = new WebSocketClient();
         Home.ws.onmessage = Home.onmessage;
@@ -76,7 +76,7 @@ class Home {
                     Home.endGame(ip, data);
                 }
                 if (data.type === "LobbyExit") {
-                    Home.exitGame(ip, data);
+                    Home.exitGame(ip);
                 }
                 break;
             case "Server": {
@@ -90,7 +90,7 @@ class Home {
                 }
 
                 document.getElementById("browser").innerHTML = ServersView.get(Home.servers);
-                timeago().render(document.querySelectorAll(".timeago"));
+                Common.loadTimeAgo();
 
                 break;
             }
@@ -193,6 +193,12 @@ class Home {
             document.getElementById(`game-${ip}`).querySelector(".map").innerText = game.settings.matchMode;
         }
 
+        if (event === "Return" && !scorer) {
+            game.flagStats.push(data);
+            game.events.push(data);
+            return;
+        }
+
         game.events.push(data);
         game.flagStats.push(data);
 
@@ -252,7 +258,7 @@ class Home {
     /**
      * Processes the end game stat.
      * @param {string} ip The IP address of the server to update.
-     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[], flagStats: object[]}} data The end game data.
+     * @param {{start: Date, end: Date, damage: object[], kills: object[], goals: object[], flagStats: object[], players: object[], teamScore: object}} data The end game data.
      * @returns {void}
      */
     static endGame(ip, data) {
@@ -279,7 +285,7 @@ class Home {
             </div>
         `);
 
-        timeago().render(document.querySelectorAll(".timeago"));
+        Common.loadTimeAgo();
 
         game.remove();
 
@@ -289,7 +295,18 @@ class Home {
         }, 3600000);
     }
 
-    static exitGame(ip, data) {
+    //              #     #     ##
+    //                    #    #  #
+    //  ##   #  #  ##    ###   #      ###  # #    ##
+    // # ##   ##    #     #    # ##  #  #  ####  # ##
+    // ##     ##    #     #    #  #  # ##  #  #  ##
+    //  ##   #  #  ###     ##   ###   # #  #  #   ##
+    /**
+     * Removes a game.
+     * @param {string} ip The IP address of the game to remove.
+     * @returns {void}
+     */
+    static exitGame(ip) {
         const game = Game.getGame(ip);
 
         const gameEl = document.getElementById(`game-${ip}`);
@@ -447,7 +464,7 @@ class Home {
 
         game.server = data.server;
         game.settings = data;
-        game.inLobby = data.type == 'LobbyStatus';
+        game.inLobby = data.type === "LobbyStatus";
         game.players = data.players && data.players.map((player) => new Player({
             name: player,
             kills: 0,
@@ -465,8 +482,6 @@ class Home {
         game.countdown = data.countdown;
         game.elapsed = data.elapsed;
 
-        const details = DetailsView.get(game, true);
-
         let gameEl = document.getElementById(`game-${ip}`);
 
         if (!gameEl) {
@@ -476,7 +491,8 @@ class Home {
             `);
             gameEl = document.getElementById(`game-${ip}`);
         }
-        gameEl.innerHTML = details;
+
+        gameEl.innerHTML = DetailsView.get(game, true);
 
         const el = gameEl.querySelector(".time");
 

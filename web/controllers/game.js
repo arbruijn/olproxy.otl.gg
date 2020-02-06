@@ -34,10 +34,32 @@ class Game {
      */
     static get(req, res) {
         const ip = req.params.ip,
-            game = JSON.parse(JSON.stringify(GameModel.getByIp(ip)));
+            gameModel = GameModel.getByIp(ip);
+
+        let game;
+        try {
+            game = JSON.parse(JSON.stringify(gameModel));
+        } catch (err) {
+            res.status(404).send(Common.page(
+                "",
+                {
+                    css: ["/css/error.css"]
+                },
+                NotFoundView.get({message: "Game not found."}),
+                req
+            ));
+            return;
+        }
 
         if (!game) {
-            res.status(404).send(Common.page("", NotFoundView.get({message: "Game not found."}), req));
+            res.status(404).send(Common.page(
+                "",
+                {
+                    css: ["/css/error.css"]
+                },
+                NotFoundView.get({message: "Game not found."}),
+                req
+            ));
             return;
         }
 
@@ -55,20 +77,29 @@ class Game {
 
         res.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
 
-        res.status(200).send(Common.page(/* html */`
-            <link rel="stylesheet" href="/css/game.css" />
-            <script src="/js/common/timeago.min.js"></script>
-            <script src="/views/common/score.js"></script>
-            <script src="/views/common/details.js"></script>
-            <script src="/views/common/players.js"></script>
-            <script src="/views/common/events.js"></script>
-            <script src="/js/common/websocketclient.js"></script>
-            <script src="/js/common/countdown.js"></script>
-            <script src="/js/common/elapsed.js"></script>
-            <script src="/js/common/player.js"></script>
-            <script src="/js/common/game.js"></script>
-            <script src="/js/game.js"></script>
-        `, GameView.get(game), req));
+        res.status(200).send(Common.page(
+            "",
+            {
+                js: [
+                    "/js/common/timeago.min.js",
+                    "/js/common/clipboard.min.js",
+                    "/js/common/clipboard.js",
+                    "/views/common/score.js",
+                    "/views/common/details.js",
+                    "/views/common/players.js",
+                    "/views/common/events.js",
+                    "/js/common/websocketclient.js",
+                    "/js/common/countdown.js",
+                    "/js/common/elapsed.js",
+                    "/js/common/player.js",
+                    "/js/common/game.js",
+                    "/js/game.js"
+                ],
+                css: ["/css/game.css"]
+            },
+            GameView.get(game),
+            req
+        ));
     }
 }
 

@@ -31,7 +31,7 @@ class About {
      * @returns {void} A promise that resolves when the request is complete.
      */
     static get(req, res) {
-        res.status(200).send(Common.page("", AboutView.get(), req));
+        res.status(200).send(Common.page("", {}, AboutView.get(), req));
     }
 }
 

@@ -1,8 +1,10 @@
 /**
  * @typedef {import("express").Request} Express.Request
+ * @typedef {{js?: string[], css?: string[]}} Files
  */
 
 const HtmlMinifier = require("html-minifier"),
+    Minify = require("../../src/minify"),
     pjson = require("../../package.json"),
     settings = require("../../settings");
 
@@ -123,14 +125,33 @@ class Common {
     /**
      * Generates a webpage from the provided HTML using a common template.
      * @param {string} head The HTML to insert into the header.
+     * @param {Files} files The files to combine and minify.
      * @param {string} html The HTML to make a full web page from.
      * @param {Express.Request} req The request of the page.
      * @returns {string} The HTML of the full web page.
      */
-    static page(head, html, req) {
+    static page(head, files, html, req) {
         if (!IndexView) {
             IndexView = require("../../public/views/index");
         }
+
+        if (!files) {
+            files = {js: [], css: []};
+        }
+
+        if (!files.js) {
+            files.js = [];
+        }
+
+        if (!files.css) {
+            files.css = [];
+        }
+
+        files.js.unshift("/js/common/common.js");
+        files.css.unshift("/css/common.css");
+        files.css.unshift("/css/reset.css");
+
+        head = `${head}${Minify.combine(files.js, "js")}${Minify.combine(files.css, "css")}`;
 
         return HtmlMinifier.minify(
             IndexView.get({
@@ -158,6 +179,10 @@ class Common {
      * @returns {string} The encoded string.
      */
     static htmlEncode(str) {
+        if (!str) {
+            return "";
+        }
+
         return str.replace(/[\u0080-\uFFFF<>&]/gim, (i) => `&#${i.charCodeAt(0)};`);
     }
 

@@ -54,7 +54,7 @@ class Index {
      * @returns {void}
      */
     static post(req, res) {
-        res.status(410).json({error: "As of v1.2, this API no longer exists.  Upgrade both your olproxy and olmod on the server."});
+        res.status(410).json({error: "As of v2.0, this API no longer exists.  Upgrade olmod on your server."});
     }
 }
 

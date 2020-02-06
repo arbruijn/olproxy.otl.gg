@@ -31,7 +31,7 @@ class Server {
      * @returns {void} A promise that resolves when the request is complete.
      */
     static get(req, res) {
-        res.status(200).send(Common.page("", ServerView.get(), req));
+        res.status(200).send(Common.page("", {}, ServerView.get(), req));
     }
 }
 

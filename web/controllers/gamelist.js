@@ -34,12 +34,19 @@ class GameList {
     static async get(req, res) {
         const games = await Completed.getList(1);
 
-        res.status(200).send(Common.page(/* html */`
-            <link rel="stylesheet" href="/css/gamelist.css" />
-            <script src="/views/gamelist/game.js"></script>
-            <script src="/views/gamelist/games.js"></script>
-            <script src="/js/gamelist.js"></script>
-        `, GameListView.get({games}), req));
+        res.status(200).send(Common.page(
+            "",
+            {
+                js: [
+                    "/views/gamelist/game.js",
+                    "/views/gamelist/games.js",
+                    "/js/gamelist.js"
+                ],
+                css: ["/css/gamelist.css"]
+            },
+            GameListView.get({games}),
+            req
+        ));
     }
 }
 

@@ -35,8 +35,8 @@ class DetailsView {
             <div class="table">
                 <div class="server">${addLink ? /* html */`
                     <a href="/game/${game.ip}">
-                        ` : ""}${DetailsView.Common.htmlEncode(game.server && game.server.name ? game.server.name : game.ip)}${addLink ? /* html */`
-                    </a>
+                        ` : ""}${DetailsView.Common.htmlEncode(game.server && game.server.name || game.server && game.server.ip || game.ip || "Unknown")}${addLink ? /* html */`
+                    </a>${game.inLobby || game.settings && game.settings.joinInProgress ? /* html */`<br />Join at ${game.ip} <button class="copy" data-clipboard-text="${game.ip}">&#x1F4CB;</button>` : ""}
                 ` : ""}</div>
                 <div class="scores">
                     ${DetailsView.ScoreView.get(game)}
@@ -44,7 +44,7 @@ class DetailsView {
                 <div class="info">
                     <div class="time">
                         ${game.inLobby ? /* html */`
-                            LOBBY ${game.settings.players.length}/${game.settings.maxPlayers}
+                            In Lobby<br />${game.settings.players.length}/${game.settings.maxPlayers} Players
                         ` : game.countdown ? /* html */`
                             <script>new Countdown(${game.countdown});</script>
                         ` : game.elapsed || game.elapsed === 0 ? /* html */`
@@ -52,7 +52,7 @@ class DetailsView {
                         ` : ""}
                     </div>
                     ${game.settings ? /* html */`
-                        <div class="map">${game.settings.matchMode}${game.settings.level && ` - ${DetailsView.Common.htmlEncode(game.settings.level)}` || ""}</div>
+                        <div class="map">${DetailsView.Common.htmlEncode(game.settings.matchMode)}${game.settings.level && ` - ${DetailsView.Common.htmlEncode(game.settings.level)}` || ""}</div>
                     ` : ""}
                     ${game.settings && game.settings.condition ? /* html */`
                         <div class="condition">${game.settings.condition}</div>

@@ -25,7 +25,7 @@ class EventsView {
         return /* html */`
             ${game.events && game.events.sort((a, b) => b.time - a.time).map((event) => /* html */`
                 <div class="time">${EventsView.Common.formatTimeSpan(event.time)}</div>
-                <div class="event">${event.description}</div>
+                <div class="event">${EventsView.Common.htmlEncode(event.description)}</div>
             `).join("") || ""}
         `;
     }

@@ -1,5 +1,4 @@
-const Common = require("../includes/common"),
-    Completed = require("../../src/models/completed");
+const Completed = require("../../src/models/completed");
 
 /**
  * @typedef {import("express").Request} express.Request

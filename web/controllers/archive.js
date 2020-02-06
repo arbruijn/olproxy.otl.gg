@@ -35,14 +35,28 @@ class Archive {
      */
     static async get(req, res) {
         if (isNaN(Number.parseInt(req.params.id, 10))) {
-            res.status(404).send(Common.page("", NotFoundView.get({message: "Game not found."}), req));
+            res.status(404).send(Common.page(
+                "",
+                {
+                    css: ["/css/error.css"]
+                },
+                NotFoundView.get({message: "Game not found."}),
+                req
+            ));
             return;
         }
 
         const game = await Completed.getById(Number.parseInt(req.params.id, 10));
 
         if (!game) {
-            res.status(404).send(Common.page("", NotFoundView.get({message: "Game not found."}), req));
+            res.status(404).send(Common.page(
+                "",
+                {
+                    css: ["/css/error.css"]
+                },
+                NotFoundView.get({message: "Game not found."}),
+                req
+            ));
             return;
         }
 
@@ -51,15 +65,22 @@ class Archive {
             weapons = game.damage.map((d) => d.weapon).filter((w, index, arr) => arr.indexOf(w) === index).sort((a, b) => Weapon.orderedWeapons.indexOf(a) - Weapon.orderedWeapons.indexOf(b));
         }
 
-        res.status(200).send(Common.page(/* html */`
-            <link rel="stylesheet" href="/css/game.css" />
-            <script src="/js/common/timeago.min.js"></script>
-            <script src="/views/common/score.js"></script>
-            <script src="/views/common/completedDetails.js"></script>
-            <script src="/views/common/players.js"></script>
-            <script src="/views/common/events.js"></script>
-            <script src="/js/archive.js"></script>
-        `, ArchiveView.get(game, weapons), req));
+        res.status(200).send(Common.page(
+            "",
+            {
+                js: [
+                    "/js/common/timeago.min.js",
+                    "/views/common/score.js",
+                    "/views/common/completedDetails.js",
+                    "/views/common/players.js",
+                    "/views/common/events.js",
+                    "/js/archive.js"
+                ],
+                css: ["/css/game.css"]
+            },
+            ArchiveView.get(game, weapons),
+            req
+        ));
     }
 }
 
